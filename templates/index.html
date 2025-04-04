@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Edit Image</title>
+    <script>
+        function uploadFile() {
+            let formData = new FormData();
+            let fileInput = document.getElementById("fileInput").files[0];
+            formData.append("file", fileInput);
+
+            fetch("/upload", { method: "POST", body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.file_path) {
+                        document.getElementById("uploadedImage").src = data.file_path;
+                        document.getElementById("uploadedImage").style.display = "block";
+                        document.getElementById("filePath").value = data.file_path;
+                    }
+                });
+        }
+
+        function editImage() {
+            let filePath = document.getElementById("filePath").value;
+            let action = document.getElementById("editAction").value;
+
+            fetch("/edit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ file_path: filePath, action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.output_path) {
+                    document.getElementById("editedImage").src = data.output_path;
+                    document.getElementById("editedImage").style.display = "block";
+                    document.getElementById("downloadLink").href = data.output_path;
+                    document.getElementById("downloadLink").style.display = "block";
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Upload and Edit Image</h2>
+
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload</button>
+
+    <h3>Edit Image</h3>
+    <img id="uploadedImage" style="display: none; width: 300px;"><br>
+
+    <select id="editAction">
+        <option value="blur">Blur</option>
+        <option value="grayscale">Grayscale</option>
+    </select>
+    <button onclick="editImage()">Apply</button>
+
+    <h3>Edited Image</h3>
+    <img id="editedImage" style="display: none; width: 300px;"><br>
+    <a id="downloadLink" style="display: none;" download>Download</a>
+
+    <input type="hidden" id="filePath">
+</body>
+</html>
