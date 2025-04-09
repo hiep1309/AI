@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: ai-image-editor
+    env: docker
+    plan: free
+    branch: main
+    repo: https://github.com/hiep1309/AI
